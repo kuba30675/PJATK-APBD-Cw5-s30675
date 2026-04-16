@@ -6,11 +6,11 @@ public class CreateRoomDto
 {
     [MaxLength(30), Required]
     public string Name { get; set; } = string.Empty;
-    [MaxLength(1), Required]
+    [Required]
     public char BuildingCode { get; set; }
-    [MaxLength(2)]
+    [Required]
     public int Floor { get; set; }
-    [MaxLength(2),Required]
+    [Required]
     public int Capacity { get; set; }
     [Required]
     public bool HasProjector { get; set; }
