@@ -13,15 +13,15 @@ public class RoomsController : ControllerBase
         bool? hasProjector, bool? activeOnly)
     {
         var rooms = Database.RoomsStorage;
-        var res = rooms.Where(r => buildingCode is null || r.BuildingCode == buildingCode)
+        var result = rooms.Where(r => buildingCode is null || r.BuildingCode == buildingCode)
             .Where(r => floor is null || r.Floor == floor)
             .Where(r => capacity is null || r.Capacity == capacity)
             .Where(r => hasProjector is null || r.HasProjector == hasProjector)
             .Where(r => activeOnly is null || r.IsActive == activeOnly).ToList();
-        if (!res.Any())
+        if (!result.Any())
             return NotFound();
 
-        return Ok(res.Select(room => new RoomDto
+        return Ok(result.Select(room => new RoomDto
         {
             Id = room.Id,
             Name = room.Name,
@@ -102,7 +102,7 @@ public class RoomsController : ControllerBase
         room.HasProjector = dto.HasProjector;
         room.IsActive = dto.IsActive;
 
-        return NoContent();
+        return Ok();
     }
 
     [HttpDelete("{id:int}")]
@@ -112,6 +112,9 @@ public class RoomsController : ControllerBase
 
         if (room is null)
             return NotFound($"There is no room with such ID: {id}");
+
+        if (Database.ReservationsStorage.Any(res => res.RoomId == room.Id))
+            return Conflict($"There is existing reservation for room {id}");
 
         Database.RoomsStorage.Remove(room);
         return NoContent();
